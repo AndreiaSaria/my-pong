@@ -10,9 +10,4 @@ public class GameController : MonoSingleton<GameController>
         if(_ball == null) return;
         _ball.ResetPositionAndMovementVector();
     }
-
-    public void ResetScore()
-    {
-        
-    }
 }

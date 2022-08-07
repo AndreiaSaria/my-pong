@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class BatMovementController : MonoBehaviour
 {
     [SerializeField] private string _upKey;
@@ -19,15 +21,19 @@ public class BatMovementController : MonoBehaviour
         up,
         down
     }
-
-    // Start is called before the first frame update
+    
     private void Start()
+    {
+        DefineLowerAndUpperLimitToStopWallBumping();
+    }
+
+    private void DefineLowerAndUpperLimitToStopWallBumping()
     {
         float boxColliderYHalfExtent = GetBoxHalfYExtent();
         _upperLimit = GetYContactPointWithWall(Vector2.up) - boxColliderYHalfExtent;
         _lowerLimit = GetYContactPointWithWall(Vector2.down) + boxColliderYHalfExtent;
     }
-
+    
     private float GetYContactPointWithWall(Vector2 directionOfWall)
     {
         var raycastHit = new List<RaycastHit2D>();
@@ -50,14 +56,10 @@ public class BatMovementController : MonoBehaviour
     {
         BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
 
-        if (boxCollider != null) return boxCollider.bounds.extents.y;
-        
-        Debug.LogError("[BatMovementController] This object is missing a box collider 2D");
-        return 0;
+        return boxCollider.bounds.extents.y;
     }
     
     //Project settings >Time >Fixed Time Step
-    //it kinda lies.
     private void FixedUpdate()
     {
         ReceiveInput();
@@ -72,17 +74,17 @@ public class BatMovementController : MonoBehaviour
 
     private void MoveBat()
     {
-        Vector3 directionToMove;
+        Vector2 directionToMove;
 
         switch (GetDirectionBatShouldMove())
         {
             case DirectionBatShouldMove.none:
                 return;
             case DirectionBatShouldMove.up:
-                directionToMove = Vector3.up;
+                directionToMove = Vector2.up;
                 break;
             case DirectionBatShouldMove.down:
-                directionToMove = Vector3.down;
+                directionToMove = Vector2.down;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(); 
@@ -90,11 +92,8 @@ public class BatMovementController : MonoBehaviour
         
         //Delta time for time difference between frames, fixed delta time for time difference between physics updates.
         //https://docs.unity3d.com/ScriptReference/Transform.Translate.html
-        //transform.Translate(directionToMove * (Time.deltaTime * _speed), Space.World);
-        //transform.position = (transform.position + directionToMove) * (Time.deltaTime * _speed);
-        
+
         transform.Translate(directionToMove * (Time.fixedDeltaTime * _speed), Space.World);
-        
         
         //Other way to do it https://answers.unity.com/questions/215377/transformtranslate-vs-rigidbodymoveposition.html
     }

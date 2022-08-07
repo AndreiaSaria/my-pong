@@ -13,8 +13,7 @@ public class ScoreController : MonoBehaviour
 
     private int _player1Score = 0;
     private int _player2Score = 0;
-
-    //https://docs.unity3d.com/Manual/ExecutionOrder.html
+    
     private void OnEnable()
     {
         _player1GoalDetector.GoalDetected += AcknowledgePlayer2Point;
